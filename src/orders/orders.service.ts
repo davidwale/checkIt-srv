@@ -1,25 +1,74 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateOrderDto } from './dto/update-order.dto';
 
 @Injectable()
-export class OrdersService {
+export class OrderService {
   constructor(private prisma: PrismaService) { }
 
-  async create(createOrderDto: CreateOrderDto) {
+  async createOrder(userId: number, createOrderDto: CreateOrderDto) {
     return this.prisma.order.create({
       data: {
-        description: createOrderDto.description,
-        specifications: createOrderDto.specifications,
-        quantity: createOrderDto.quantity,
-        metadata: createOrderDto.metadata,
-        status: 'Review',
-        user: { connect: { id: createOrderDto.userId } },
+        ...createOrderDto,
+        userId,
       },
     });
   }
 
-  async findAll() {
-    return this.prisma.order.findMany();
+  async findAll(userId: number) {
+    return this.prisma.order.findMany({
+      where: {
+        userId,
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
+
+  async findOne(id: number, userId: number) {
+    const order = await this.prisma.order.findUnique({
+      where: { id }
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    if (order.userId !== userId) {
+      throw new ForbiddenException('You do not have access to this order');
+    }
+
+    return order;
+  }
+
+  async update(id: number, updateOrderDto: UpdateOrderDto) {
+    return this.prisma.order.update({
+      where: { id },
+      data: updateOrderDto,
+    });
+  }
+
+  async delete(id: number, userId: number) {
+    const order = await this.prisma.order.findUnique({
+      where: { id },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order not found`);
+    }
+    if (order.userId !== userId) {
+      throw new ForbiddenException('You do not have access to this order');
+    }
+
+    return this.prisma.order.delete({
+      where: { id },
+    });
   }
 }

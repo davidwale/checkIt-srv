@@ -14,9 +14,5 @@ export class CreateOrderDto {
     quantity: number;
 
     @IsNotEmpty()
-    @IsInt()
-    userId: number;
-
-
     metadata: object;
 }
