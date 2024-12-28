@@ -1,0 +1,52 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  password  String
+  role      Role     @default(USER)
+  orders    Order[]
+  chats     Chat[]
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model Order {
+  id            Int      @id @default(autoincrement())
+  description   String
+  specifications String
+  quantity      Int
+  metadata      Json
+  status        String  @default("Review")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  userId        Int
+  user          User    @relation(fields: [userId], references: [id])
+
+  chat          Chat?   
+}
+
+model Chat {
+  id        Int      @id @default(autoincrement())
+  message   String
+  sentAt    DateTime @default(now())
+  userId    Int
+  orderId   Int @unique  
+
+  order     Order    @relation(fields: [orderId], references: [id])  
+  user      User     @relation(fields: [userId], references: [id])
+}
