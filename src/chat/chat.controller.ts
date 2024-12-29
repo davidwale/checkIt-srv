@@ -1,17 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Request, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Request, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ChatService } from './chat.service';
+import { MessageDto } from './dto/create-chat.dto';
 
 @Controller('chat')
 export class ChatController {
   constructor(private chatService: ChatService) { }
 
   @Post(':chatRoomId/message')
+  @UsePipes(new ValidationPipe({ transform: true }))
   async sendMessage(
     @Param('chatRoomId') chatRoomId: number,
     @Request() req,
-    @Body() body
+    @Body() messageDto: MessageDto
   ) {
-    const { content } = body;
+    const { content } = messageDto;
     return this.chatService.sendMessage(chatRoomId, req.user.id, content);
   }
 

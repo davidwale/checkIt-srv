@@ -1,6 +1,10 @@
-import { Controller, Get, Param, Post, Patch, Body, Request, UseGuards, ForbiddenException } from '@nestjs/common';
+import {
+  Controller, Get, Param, Post, Patch, Body, Request, UseGuards, ForbiddenException, UsePipes, ValidationPipe
+} from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AdminGuard } from './admin-guard';
+import { CreateMessageDto } from './dto/create-message.dto';
+import { CloseChatRoomDto } from './dto/close-chatroom.dto';
 
 @Controller('admin')
 @UseGuards(AdminGuard)
@@ -38,26 +42,28 @@ export class AdminController {
   }
 
   @Post('chat/:chatRoomId/message')
+  @UsePipes(new ValidationPipe({ transform: true }))
   async sendMessage(
     @Param('chatRoomId') chatRoomId: number,
     @Request() req,
-    @Body() body
+    @Body() createMessageDto: CreateMessageDto
   ) {
-    const { content } = body;
+    const { content } = createMessageDto;
     return this.adminService.sendMessage(chatRoomId, req.user.id, content);
   }
 
   @Patch('chat/:chatRoomId/close')
+  @UsePipes(new ValidationPipe({ transform: true }))
   async closeChatRoom(
     @Param('chatRoomId') chatRoomId: number,
     @Request() req,
-    @Body() body
+    @Body() closeChatRoomDto: CloseChatRoomDto
   ) {
     if (req.user.role !== 'ADMIN') {
       throw new ForbiddenException('Only admins can close chat rooms');
     }
 
-    const { summary } = body;
+    const { summary } = closeChatRoomDto;
     return this.adminService.closeChatRoom(chatRoomId, req.user.id, summary);
   }
 }
