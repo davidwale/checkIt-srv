@@ -7,3 +7,8 @@ export class Order {
     status: string;
     createdAt: Date;
 }
+
+export class ChatRoom {
+    orderId: number;
+
+}

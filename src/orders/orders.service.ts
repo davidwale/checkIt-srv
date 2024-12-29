@@ -8,12 +8,21 @@ export class OrderService {
   constructor(private prisma: PrismaService) { }
 
   async createOrder(userId: number, createOrderDto: CreateOrderDto) {
-    return this.prisma.order.create({
+    const order = await this.prisma.order.create({
       data: {
         ...createOrderDto,
         userId,
       },
     });
+
+    const chatRoom = await this.prisma.chatRoom.create({
+      data: {
+        orderId: order.id,
+        userId,
+      },
+    });
+
+    return { order, chatRoom };
   }
 
   async findAll(userId: number) {

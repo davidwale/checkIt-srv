@@ -1,4 +1,3 @@
-// prisma/schema.prisma
 
 generator client {
   provider = "prisma-client-js"
@@ -16,7 +15,7 @@ model User {
   password  String
   role      Role     @default(USER)
   orders    Order[]
-  chats     Chat[]
+  chatRooms     ChatRoom[]
 }
 
 enum Role {
@@ -37,16 +36,29 @@ model Order {
   userId        Int
   user          User    @relation(fields: [userId], references: [id])
 
-  chat          Chat?   
+  chatRoom      ChatRoom?   
 }
 
-model Chat {
-  id        Int      @id @default(autoincrement())
-  message   String
-  sentAt    DateTime @default(now())
-  userId    Int
-  orderId   Int @unique  
+model ChatRoom {
+  id          Int        @id @default(autoincrement())
+  orderId     Int        @unique
+  isClosed    Boolean    @default(false)
+  summary     String?
+  messages    Message[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt()
 
-  order     Order    @relation(fields: [orderId], references: [id])  
-  user      User     @relation(fields: [userId], references: [id])
+  order       Order      @relation(fields: [orderId], references: [id])
+  user        User       @relation(fields: [userId], references: [id])
+  userId      Int
+}
+
+model Message {
+  id          Int        @id @default(autoincrement())
+  chatRoomId  Int
+  senderId    Int
+  content     String
+  createdAt   DateTime   @default(now())
+
+  chatRoom    ChatRoom   @relation(fields: [chatRoomId], references: [id])
 }
