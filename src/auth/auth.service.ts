@@ -58,7 +58,7 @@ export class AuthService {
     return newAdmin;
   }
 
-  async login(loginDto: LoginDto): Promise<{ accessToken: string }> {
+  async login(loginDto: LoginDto): Promise<{ role: string, accessToken: string }> {
     const { email, password } = loginDto;
 
     const user = await this.prisma.user.findUnique({ where: { email } });
@@ -69,14 +69,14 @@ export class AuthService {
     if (!passwordMatch) {
       throw new UnauthorizedException('Invalid password');
     }
-
+    const role = user.role;
     const accessToken = this.generateJwt(user);
 
-    return { accessToken };
+    return { role, accessToken };
   }
 
   private generateJwt(user: any): string {
     const payload = { id: user.id, role: user.role };
-    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE_TIME });
   }
 }

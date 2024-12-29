@@ -14,7 +14,8 @@ export class ChatController {
     @Body() messageDto: MessageDto
   ) {
     const { content } = messageDto;
-    return this.chatService.sendMessage(chatRoomId, req.user.id, content);
+    const adminId = null;
+    return this.chatService.sendMessage(chatRoomId, req.user.id, adminId, content);
   }
 
   @Get(':chatRoomId/messages')

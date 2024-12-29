@@ -9,7 +9,7 @@ import { AuthMiddleware } from 'src/middleware/auth.middleware';
   imports: [
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '1h' },
+      signOptions: { expiresIn: process.env.JWT_EXPIRE_TIME },
     }), PrismaModule],
   controllers: [AuthController],
   providers: [AuthService, AuthMiddleware],

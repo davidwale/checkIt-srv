@@ -6,7 +6,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class ChatService {
   constructor(private prisma: PrismaService) { }
 
-  async sendMessage(chatRoomId: number, senderId: number, content: string) {
+  async sendMessage(chatRoomId: number, senderId: number, adminId: number | null, content: string) {
     const chatRoom = await this.prisma.chatRoom.findUnique({
       where: { id: chatRoomId },
     });
@@ -22,6 +22,7 @@ export class ChatService {
       data: {
         chatRoomId,
         senderId,
+        adminId: adminId || null,
         content,
       },
     });
