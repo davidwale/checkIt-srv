@@ -6,16 +6,18 @@ export class AdminService {
   constructor(private prisma: PrismaService) { }
 
   async findAllChatRooms() {
-    return this.prisma.chatRoom.findMany({
-      include: { messages: true, order: true },
-    });
+    return this.prisma.chatRoom.findMany();
   }
 
   async findChatRoomById(chatRoomId: number) {
-    return this.prisma.chatRoom.findUnique({
+    const chatRoom = this.prisma.chatRoom.findUnique({
       where: { id: chatRoomId },
       include: { messages: true, order: true },
     });
+    if (!chatRoom) {
+      throw new NotFoundException('ChatRoom Not Found!');
+    }
+    return chatRoom;
   }
 
   async findAllOrders() {
@@ -39,7 +41,7 @@ export class AdminService {
       where: { userId },
     });
     if (!orders) {
-      throw new NotFoundException('No orders found');
+      throw new NotFoundException('User has not make any order!');
     }
 
     return orders;
@@ -92,5 +94,16 @@ export class AdminService {
     });
 
     return chatRoom;
+  }
+
+  async completeOrder(orderId: number) {
+    const order = await this.prisma.order.update({
+      where: { id: orderId },
+      data: {
+        status: "completed"
+      },
+    });
+
+    return order;
   }
 }

@@ -66,4 +66,15 @@ export class AdminController {
     const { summary } = closeChatRoomDto;
     return this.adminService.closeChatRoom(chatRoomId, req.user.id, summary);
   }
+
+  @Patch('orders/:orderId/completed')
+  async completeOrder(
+    @Param('orderId') orderId: number,
+    @Request() req
+  ) {
+    if (req.user.role !== 'ADMIN') {
+      throw new ForbiddenException('Only admins can complete orders');
+    }
+    return this.adminService.completeOrder(orderId);
+  }
 }
