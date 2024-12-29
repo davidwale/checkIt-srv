@@ -17,22 +17,10 @@ export class ChatController {
 
   @Get(':chatRoomId/messages')
   async getMessages(@Param('chatRoomId') chatRoomId: number, @Request() req) {
-    const isAdmin = req.user.role === 'admin';
+    const isAdmin = req.user.role === 'ADMIN';
     return this.chatService.getChatMessages(chatRoomId, req.user.id, isAdmin);
   }
 
-  @Patch(':chatRoomId/close')
-  async closeChatRoom(
-    @Param('chatRoomId') chatRoomId: number,
-    @Request() req,
-    @Body() body
-  ) {
-    if (req.user.role !== 'admin') {
-      throw new ForbiddenException('Only admins can close chat rooms');
-    }
 
-    const { summary } = body;
-    return this.chatService.closeChatRoom(chatRoomId, req.user.id, summary);
-  }
 }
 

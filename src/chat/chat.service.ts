@@ -43,16 +43,5 @@ export class ChatService {
     });
   }
 
-  async closeChatRoom(chatRoomId: number, adminId: number, summary: string) {
-    const chatRoom = await this.prisma.chatRoom.update({
-      where: { id: chatRoomId },
-      data: {
-        isClosed: true,
-        summary,
-      },
-    });
-
-    return chatRoom;
-  }
 }
 

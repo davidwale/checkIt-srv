@@ -13,8 +13,8 @@ export class AuthController {
   async registerUser(
     @Body() RegisterUserDto: RegisterUserDto,
   ): Promise<ResponseDto<any>> {
-    const result = await this.authService.registerUser(RegisterUserDto);
-    return new ResponseDto('success', 'User created successfully', result);
+    await this.authService.registerUser(RegisterUserDto);
+    return new ResponseDto('success', 'User created successfully', null);
   }
 
   @Post('admin/register')
@@ -26,8 +26,8 @@ export class AuthController {
       throw new BadRequestException('Invalid admin key');
     }
 
-    const result = await this.authService.registerAdmin(RegisterAdminDto);
-    return new ResponseDto('success', 'Admin created successfully', result);
+    await this.authService.registerAdmin(RegisterAdminDto);
+    return new ResponseDto('success', 'Admin created successfully', null);
   }
 
   @Post('login')
