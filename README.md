@@ -25,37 +25,37 @@ Key Features
 -   When they create an order a chatroom is automatically created for that order.
 
 
-### 1\. Real-Time Messaging
+### 4\. Real-Time Messaging
 
 -   Supports real-time communication between users and admins.
 -   Messages are broadcast to all users in a specific chat room.
 -   Users can only send messages to their created chatrooms.
 -   Admins can send messages to multiple users within different chat rooms.
 
-### 2\. Role-Based Messaging
+### 5\. Role-Based Messaging
 
 -   **Users** are identified by `senderId`. If `senderId` is `null`, the message is from an admin.
 -   **Admins** are identified by their `adminId`. If `adminId` is `null`, the message is from a user.
 
-### 3\. WebSocket Authentication
+### 6\. WebSocket Authentication
 
 -   WebSocket connections are secured using **JWT tokens**.
 -   Users must provide a valid token to establish a WebSocket connection.
 -   Invalid or expired tokens result in connection termination.
 
-### 4\. Chat Room Management
+### 7\. Chat Room Management
 
 -   Users and admins can join specific chat rooms by emitting a `join_chat` event.
 -   Chat rooms are dynamically created based on `chatRoomId`.
 -   Admins can close chatrooms and they must provide a summary before closing the chatroom.
 
-### 5\. Error Handling
+### 8\. Error Handling
 
 -   Errors during message handling or authentication trigger `error` events to notify the client.
 -   Errors are returned on invalid requests.
 -   Users are notified of invalid token usage or unauthorized access.
 
-### 6\. Session Persistence
+### 9\. Session Persistence
 
 -   Users remain connected to chat rooms until they disconnect manually or their session expires.
 -   Reconnection is handled gracefully.
@@ -65,14 +65,14 @@ Installation
 
 ### Prerequisites
 
--   **Node.js** (v16+ recommended)
+-   **Node.js** 
 -   **NestJS CLI**
 
 ### Setup
 
 ```
 # Clone the repository
-git clone https://github.com/your-repo/websocket-chat.git
+git clone https://github.com/davidwale/checkIt-srv.git
 cd checkit-assessment
 
 # Install dependencies
