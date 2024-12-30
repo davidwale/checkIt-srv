@@ -1,99 +1,149 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+CheckIt Assessment
+===============================================
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Project Overview
+----------------
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+This project is an order creation and real-time chat application built with **NestJS** and **Socket.IO** to handle bi-directional communication between users and admins. The app leverages WebSockets for instant messaging and JWT-based authentication to authenticate users for user based roles and admins for admin based roles. It uses postgres with Prisma for the database.
 
-## Description
+Key Features
+------------
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### 1\. User Authentication
 
-## Project setup
+-   Users can create an account with their emails, name and password.
+-   Users can login with their email and password.
 
-```bash
-$ npm install
+### 2\. Admin Authentication
+
+-   Admins can create an account with their emails, name, secretKey and password(Secret Key is required to create an admin account).
+-   Admins can login with their email and password.
+
+### 3\. Order and Chat creation
+
+-   Authenticated Users can create orders. 
+-   When they create an order a chatroom is automatically created for that order.
+
+
+### 1\. Real-Time Messaging
+
+-   Supports real-time communication between users and admins.
+-   Messages are broadcast to all users in a specific chat room.
+-   Users can only send messages to their created chatrooms.
+-   Admins can send messages to multiple users within different chat rooms.
+
+### 2\. Role-Based Messaging
+
+-   **Users** are identified by `senderId`. If `senderId` is `null`, the message is from an admin.
+-   **Admins** are identified by their `adminId`. If `adminId` is `null`, the message is from a user.
+
+### 3\. WebSocket Authentication
+
+-   WebSocket connections are secured using **JWT tokens**.
+-   Users must provide a valid token to establish a WebSocket connection.
+-   Invalid or expired tokens result in connection termination.
+
+### 4\. Chat Room Management
+
+-   Users and admins can join specific chat rooms by emitting a `join_chat` event.
+-   Chat rooms are dynamically created based on `chatRoomId`.
+-   Admins can close chatrooms and they must provide a summary before closing the chatroom.
+
+### 5\. Error Handling
+
+-   Errors during message handling or authentication trigger `error` events to notify the client.
+-   Errors are returned on invalid requests.
+-   Users are notified of invalid token usage or unauthorized access.
+
+### 6\. Session Persistence
+
+-   Users remain connected to chat rooms until they disconnect manually or their session expires.
+-   Reconnection is handled gracefully.
+
+Installation
+------------
+
+### Prerequisites
+
+-   **Node.js** (v16+ recommended)
+-   **NestJS CLI**
+
+### Setup
+
+```
+# Clone the repository
+git clone https://github.com/your-repo/websocket-chat.git
+cd checkit-assessment
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+Create a `.env` file in the root directory and add the following:
+
+```env
+DATABASE_URL="postgresql://DBUSER:DBPASS@DBHOST:5432/DBNAME?schema=public"
+ADMIN_SECRET_KEY=secretkey
+JWT_SECRET=jwt_secret
+ALLOWED_CLIENT_URL=frontend_url
+JWT_EXPIRE_TIME=jwt_expiry_time
+
+
+# Run the application
+npm run start
+
 ```
 
-## Compile and run the project
+API Endpoints
+-------------
 
-```bash
-# development
-$ npm run start
+**Note:** While the main communication happens over WebSockets, there are still endpoints for sending and receiving messages.
 
-# watch mode
-$ npm run start:dev
+### Auth Endpoints
+-   **POST /auth/register** - Create a user account
+-   **POST /auth/admin/register** - Create an admin account
+-   **POST /auth/login** - Authenticate user or admin and receive JWT token.
 
-# production mode
-$ npm run start:prod
-```
+### Order Endpoints(USER)
+-   **POST /orders** - Create a new order. A chatroom is automatically created.
+-   **GET /orders** - Retrieve all orders for authenticated user.
+-   **GET /orders/:id** - Retrieve specific order for authenticated user.
+-   **PATCH /orders/:id** - Update specific order for authenticated user.
+-   **DELETE /orders/:id** - Delete specific order for authenticated user.
 
-## Run tests
+### Chat Endpoints(USER)
+-   **POST /chat/:chatRoomId/message** - Sends a new message for user.
+-   **GET /chat/:chatRoomId/message** - Get messages for chatroom.
 
-```bash
-# unit tests
-$ npm run test
+### Chat Endpoints(ADMIN)
+-   **POST /admin/chat/:chatRoomId/message** - Sends a new message for admin.
+-   **GET /admin/chatrooms** - Retrieve all chat rooms.
+-   **GET /admin/chatrooms/:chatRoomId** - Retrieve specific chatroom details.
+-   **GET /admin/chatrooms/user/:userId** - Retrieve chatroom for specific user.
+-   **PATCH /admin/chat/:chatRoomId/close** - Closes chat room. Retrieve summary for chatroom.
+-   **PATCH /admin/chat/:chatRoomId/completed** - Sets order status as completed.
 
-# e2e tests
-$ npm run test:e2e
+### Order Endpoints(ADMIN)
+-   **GET /admin/orders** - Retrieve all orders.
+-   **GET /admin/orders/:id** - Retrieve specific order.
+-   **GET /admin/orders/user/:userId** - Retrieve order for specific user.
 
-# test coverage
-$ npm run test:cov
-```
+WebSocket Events
+----------------
 
-## Deployment
+### Events from Client
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+-   **`send_message`** -- Send message to a specific chat room.
+-   **`join_chat`** -- Join a specific chat room.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Events from Server
 
-```bash
-$ npm install -g mau
-$ mau deploy
-```
+-   **`receive_message`** -- Broadcast messages to all clients in the room.
+-   **`joined_chat`** -- Notify users when they successfully join a chat room.
+-   **`error`** -- Notify clients of errors during message sending or authentication.
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
 
-## Resources
+License
+-------
 
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This project is open-source and available under the MIT License.
