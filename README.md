@@ -1,4 +1,4 @@
-chat-orders-api Assessment
+chat-orders-api
 ===============================================
 
 Project Overview
