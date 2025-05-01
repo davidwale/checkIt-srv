@@ -1,4 +1,4 @@
-CheckIt Assessment
+chat-orders-api Assessment
 ===============================================
 
 Project Overview
